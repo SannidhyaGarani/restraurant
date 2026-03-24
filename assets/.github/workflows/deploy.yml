@@ -1,0 +1,22 @@
+name: Auto Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main   # when you push code
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to EC2 and deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: 52.66.199.135   # your EC2 public IP
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /var/www/html
+            git pull origin main
+            sudo systemctl restart nginx
