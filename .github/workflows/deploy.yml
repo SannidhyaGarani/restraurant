@@ -9,16 +9,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    script: |
-          cd /var/www/html
+    steps:
+      - name: Connect to EC2 and Deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: 52.66.199.135
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /var/www/html
 
-          git reset --hard
-          git pull origin main
+            git reset --hard
+            git pull origin main
 
-          sudo systemctl stop nginx || true
+            sudo systemctl stop nginx || true
 
-          sudo docker stop $(sudo docker ps -q) || true
-          sudo docker rm $(sudo docker ps -aq) || true
+            sudo docker stop $(sudo docker ps -q) || true
+            sudo docker rm $(sudo docker ps -aq) || true
 
-          sudo docker build --no-cache -t restaurant-app .
-          sudo docker run -d -p 80:80 restaurant-app
+            sudo docker build --no-cache -t restaurant-app .
+            sudo docker run -d -p 80:80 restaurant-app
