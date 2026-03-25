@@ -1,9 +1,27 @@
-script: |
-  cd /var/www/html
-  git pull origin main
+name: Auto Deploy to EC2
 
-  sudo docker stop $(sudo docker ps -q) || true
-  sudo docker rm $(sudo docker ps -aq) || true
+on:
+  push:
+    branches:
+      - main
 
-  sudo docker build -t restaurant-app .
-  sudo docker run -d -p 80:80 restaurant-app
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to EC2 and Deploy
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: 52.66.199.135
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /var/www/html
+            git pull origin main
+
+            sudo docker stop $(sudo docker ps -q) || true
+            sudo docker rm $(sudo docker ps -aq) || true
+
+            sudo docker build -t restaurant-app .
+            sudo docker run -d -p 80:80 restaurant-app
