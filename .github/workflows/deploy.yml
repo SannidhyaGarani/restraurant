@@ -17,9 +17,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo su
             cd /var/www/html
-             git reset --hard
+            git reset --hard
             git pull origin main
 
             sudo systemctl stop nginx || true
