@@ -1,22 +1,31 @@
-name: Auto Deploy to EC2
+# name: Auto Deploy to EC2
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: 52.66.199.135
-          username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            cd /var/www/html
-            git pull origin main
-            sudo systemctl restart nginx
+#     steps:
+#       - name: Deploy to EC2
+#         uses: appleboy/ssh-action@v0.1.6
+#         with:
+#           host: 52.66.199.135
+#           username: ubuntu
+#           key: ${{ secrets.EC2_KEY }}
+#           script: |
+#             cd /var/www/html
+#             git pull origin main
+#             sudo systemctl restart nginx
+script: |
+  cd /var/www/html
+  git pull origin main
+
+  sudo docker stop $(sudo docker ps -q) || true
+  sudo docker rm $(sudo docker ps -aq) || true
+
+  sudo docker build -t restaurant-app .
+  sudo docker run -d -p 80:80 restaurant-app
